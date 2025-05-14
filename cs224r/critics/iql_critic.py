@@ -84,14 +84,9 @@ class IQLCritic(BaseCritic):
         # HINT: Use self.expectile_loss as defined above, 
         # passing in the difference between the computed targets and predictions
         ### YOUR CODE START HERE ###
-        print("ob dim ", self.ob_dim)
-        print("ac dim", self.ac_dim)
-        print("ob_no shape", ob_no.shape)
-        print("ac_na shape", ac_na.shape)
-        
-        value_loss = None
         pred = self.v_net(ob_no)
-        diff = self.q_net_target(ob_no)
+        diff = self.q_net_target(ob_no)[ac_na] - pred
+        value_loss = self.expectile_loss(diff)
         ### YOUR CODE END HERE ###
         
 
@@ -122,6 +117,10 @@ class IQLCritic(BaseCritic):
         # its target reward value needs to be adjusted.
         ### YOUR CODE START HERE ###
         loss = None
+        print("reward_n", reward_n.shape)
+        print("ob_no", ob_no.shape)
+        print("ac_na", ac_na.shape)
+        print("terminal_n", terminal_n.shape)
         ### YOUR CODE END HERE ###
         self.optimizer.zero_grad()
         loss.backward()
