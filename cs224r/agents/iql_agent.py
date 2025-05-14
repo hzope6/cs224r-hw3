@@ -71,7 +71,11 @@ class IQLAgent(DQNAgent):
         # HINT: Access critic using self.exploitation_critic 
         # (critic trained in the offline setting)
         ### YOUR CODE START HERE ###
-        pass
+        # use Q_hat(s,a) - V_hat(s)
+        v_hat = self.get_qvals(self.exploitation_critic, ob_no, ac_na, use_v=True)
+        q_hat = self.get_qvals(self.exploitation_critic, ob_no, ac_na)
+        return q_hat - v_hat
+
         ### YOUR CODE END HERE ###
         
     def train(self, ob_no, ac_na, re_n, next_ob_no, terminal_n):
@@ -86,7 +90,7 @@ class IQLAgent(DQNAgent):
                 and self.replay_buffer.can_sample(self.batch_size)
         ):
 
-           
+
             explore_weight = self.explore_weight_schedule.value(self.t)
             exploit_weight = self.exploit_weight_schedule.value(self.t)
 
@@ -114,8 +118,8 @@ class IQLAgent(DQNAgent):
             # TODO 2): Calculate the awac actor loss
             
             ### YOUR CODE START HERE ###
-            advantage = None
-            actor_loss = None
+            advantage = self.estimate_advantage(ob_no, ac_na, re_n, next_ob_no, terminal_n)
+            actor_loss = self.awac_actor.update(ob_no, ac_na, advantage)
             ### YOUR CODE END HERE ###
             
             
