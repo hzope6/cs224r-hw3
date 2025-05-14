@@ -85,7 +85,7 @@ class IQLCritic(BaseCritic):
         # passing in the difference between the computed targets and predictions
         ### YOUR CODE START HERE ###
         pred = self.v_net(ob_no)
-        diff = self.q_net_target(ob_no)[ac_na] - pred
+        diff = self.q_net_target(ob_no)[torch.arange(ob_no.shape[0]), ac_na] - pred
         value_loss = self.expectile_loss(diff).mean()
         ### YOUR CODE END HERE ###
         
@@ -105,22 +105,18 @@ class IQLCritic(BaseCritic):
         """
         Use target v network to train Q
         """
-        ob_no = ptu.from_numpy(ob_no)
-        ac_na = ptu.from_numpy(ac_na).to(torch.long)
-        next_ob_no = ptu.from_numpy(next_ob_no)
-        reward_n = ptu.from_numpy(reward_n)
-        terminal_n = ptu.from_numpy(terminal_n)
+        ob_no = ptu.from_numpy(ob_no)  # of size [256, ob_dim]
+        ac_na = ptu.from_numpy(ac_na).to(torch.long) # tensor of length 256
+        next_ob_no = ptu.from_numpy(next_ob_no) 
+        reward_n = ptu.from_numpy(reward_n)  # tensor of length 256
+        terminal_n = ptu.from_numpy(terminal_n) # tensor of length 256
         
         
         # TODO: Compute loss for updating Q_net parameters
         # HINT: Note that if the next state is terminal, 
         # its target reward value needs to be adjusted.
         ### YOUR CODE START HERE ###
-        loss = None
-        print("reward_n", reward_n.shape)
-        print("ob_no", ob_no.shape)
-        print("ac_na", ac_na.shape)
-        print("terminal_n", terminal_n.shape)
+        loss = ((reward_n + self.gamma * self.v_net(next_ob_no) - self.q_net_target(ob_no)[torch.arange(ob_no.shape[0]), ac_na]) ** 2).mean()
         ### YOUR CODE END HERE ###
         self.optimizer.zero_grad()
         loss.backward()
