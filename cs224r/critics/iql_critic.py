@@ -86,7 +86,7 @@ class IQLCritic(BaseCritic):
         ### YOUR CODE START HERE ###
         pred = self.v_net(ob_no)
         diff = self.q_net_target(ob_no)[ac_na] - pred
-        value_loss = self.expectile_loss(diff)
+        value_loss = self.expectile_loss(diff).mean()
         ### YOUR CODE END HERE ###
         
 
