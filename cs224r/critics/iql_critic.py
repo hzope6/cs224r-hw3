@@ -84,8 +84,8 @@ class IQLCritic(BaseCritic):
         # HINT: Use self.expectile_loss as defined above, 
         # passing in the difference between the computed targets and predictions
         ### YOUR CODE START HERE ###
-        self.print("ob dim ", self.ob_dim)
-        self.print("ac dim", self.ac_dim)
+        print("ob dim ", self.ob_dim)
+        print("ac dim", self.ac_dim)
         print("ob_no shape", ob_no.shape)
         print("ac_na shape", ac_na.shape)
         
