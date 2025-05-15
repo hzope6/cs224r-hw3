@@ -84,8 +84,12 @@ class IQLCritic(BaseCritic):
         # HINT: Use self.expectile_loss as defined above, 
         # passing in the difference between the computed targets and predictions
         ### YOUR CODE START HERE ###
-        pred = self.v_net(ob_no)
-        diff = self.q_net_target(ob_no)[torch.arange(ob_no.shape[0]), ac_na] - pred
+        # TODO: check if you need to squeeze here
+        v = self.v_net(ob_no)
+        print(v.shape)
+        q = self.q_net_target(ob_no)[torch.arange(ob_no.shape[0]), ac_na]
+        print(q.shape)
+        diff = q - v
         value_loss = self.expectile_loss(diff).mean()
         ### YOUR CODE END HERE ###
         
@@ -116,8 +120,14 @@ class IQLCritic(BaseCritic):
         # HINT: Note that if the next state is terminal, 
         # its target reward value needs to be adjusted.
         ### YOUR CODE START HERE ###
+        # check dimensions of v and whether we need to squeeze v 
+        v = self.v_net(next_ob_no)
+        print(v.shape)
         v_next_state = self.v_net(next_ob_no) * (1 - terminal_n)
-        loss = ((reward_n + self.gamma * v_next_state - self.q_net_target(ob_no)[torch.arange(ob_no.shape[0]), ac_na]) ** 2).mean()
+        # use MSE loss here (reward + V) - Q
+        q = self.q_net(ob_no)[torch.arange(ob_no.shape[0]), ac_na]
+        print(q.shape)
+        loss = self.mse_loss(reward_n + self.gamma * v_next_state, q)
         ### YOUR CODE END HERE ###
         self.optimizer.zero_grad()
         loss.backward()
