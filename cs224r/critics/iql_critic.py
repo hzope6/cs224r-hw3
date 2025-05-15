@@ -88,7 +88,7 @@ class IQLCritic(BaseCritic):
         v = torch.squeeze(self.v_net(ob_no))
         q = self.q_net_target(ob_no)[torch.arange(ob_no.shape[0]), ac_na]
         diff = q - v
-        value_loss = self.expectile_loss(diff).mean()
+        value_loss = torch.mean(self.expectile_loss(diff))
         ### YOUR CODE END HERE ###
         
 
@@ -119,13 +119,10 @@ class IQLCritic(BaseCritic):
         # its target reward value needs to be adjusted.
         ### YOUR CODE START HERE ###
         # check dimensions of v and whether we need to squeeze v 
-        v = torch.squeeze(self.v_net(next_ob_no))
-        print(v.shape)
-        v_next_state = self.v_net(next_ob_no) * (1 - terminal_n)
+        v = torch.squeeze(self.v_net(next_ob_no)) * (1 - terminal_n)
         # use MSE loss here (reward + V) - Q
         q = self.q_net(ob_no)[torch.arange(ob_no.shape[0]), ac_na]
-        print(q.shape)
-        loss = self.mse_loss(reward_n + self.gamma * v_next_state, q)
+        loss = self.mse_loss(reward_n + self.gamma * v, q)
         ### YOUR CODE END HERE ###
         self.optimizer.zero_grad()
         loss.backward()
