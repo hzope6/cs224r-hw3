@@ -86,9 +86,7 @@ class IQLCritic(BaseCritic):
         ### YOUR CODE START HERE ###
         # TODO: check if you need to squeeze here
         v = torch.squeeze(self.v_net(ob_no))
-        print(v.shape)
         q = self.q_net_target(ob_no)[torch.arange(ob_no.shape[0]), ac_na]
-        print(q.shape)
         diff = q - v
         value_loss = self.expectile_loss(diff).mean()
         ### YOUR CODE END HERE ###
